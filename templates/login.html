@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{% if mode == 'signup' %}Create account{% else %}Sign in{% endif %}{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <img src="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/5cf3d339-3fb1-4162-8fe4-43a98826b177.png"
+       alt="Biyet Event — Kote plezi a ye"
+       style="display:block;width:100%;max-width:300px;height:auto;margin:0 auto 1.25rem;">
+  <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Biyet Event — Kote plezi a ye</h1>
+  <p class="muted">{% if mode == 'signup' %}Create your Biyet Event account to grab tickets and swap seats.{% else %}Sign in with your Biyet Event account — the same one you use in the app.{% endif %}</p>
+  {% if error %}<div class="msg msg-error">{{ error }}</div>{% endif %}
+
+  {% if not firebase_enabled %}
+    <div class="msg msg-warning">Firebase isn't configured yet. Add your web config to <code>.env</code> (see README).</div>
+  {% else %}
+  <div id="auth-root" data-mode="{{ mode }}" data-next="{{ next }}" data-session-url="{% url 'firebase_session' %}" data-signup-url="{% url 'signup_create' %}">
+    <form id="email-form" class="stack">
+      {% if mode == 'signup' %}
+      <div class="row"><label class="grow">First name <input name="firstName" required autocomplete="given-name"></label>
+        <label class="grow">Last name <input name="lastName" required autocomplete="family-name"></label></div>
+      <label>Country <select name="country" required><option value="">Select your country</option>{% for code, label in countries %}<option value="{{ code }}">{{ label }}</option>{% endfor %}</select></label>
+      <label>Language <select name="prefLang" data-lang>{% for l in languages %}<option>{{ l }}</option>{% endfor %}</select></label>
+      {% endif %}
+      <label>Email <input type="email" name="email" required autocomplete="email"></label>
+      <label>Password <input type="password" name="password" required minlength="6" autocomplete="{% if mode == 'signup' %}new-password{% else %}current-password{% endif %}"></label>
+      {% if mode == 'signup' %}
+      <label>Confirm password <input type="password" name="confirm" required minlength="6" autocomplete="new-password"></label>
+      <label>Friend's referral code <span class="muted">(optional)</span><input name="referral" inputmode="numeric" maxlength="8"></label>
+      <button class="btn btn-block" type="submit">Create account</button>
+      <p class="small muted center">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+      {% else %}
+      <button class="btn btn-block" type="submit">Sign in</button>
+      <button type="button" class="linklike small" id="reset-btn">Forgot password?</button>
+      <p class="small muted center">New to Biyet Event? <a href="{% url 'signup' %}">Create an account</a></p>
+      {% endif %}
+    </form>
+    <p id="auth-error" class="error" role="alert" hidden></p>
+  </div>
+  {% endif %}
+  {% if demo %}<p class="center"><a class="btn btn-ghost" href="{% url 'demo_login' %}">Try the demo account</a></p>{% endif %}
+  {% csrf_token %}
+</section>
+{% endblock %}

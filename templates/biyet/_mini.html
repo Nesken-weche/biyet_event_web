@@ -1,0 +1,5 @@
+<a class="mini-card" href="{% url 'event_detail' c.e.id %}">
+  <div class="mini-cover" {% if c.image %}style="background-image:url('{{ c.image }}')"{% endif %}>{% if not c.image %}<span class="cover-emoji">{{ c.emoji }}</span>{% endif %}
+    <div class="datechip small-chip"><span>{{ c.date|date:"M" }}</span><strong>{{ c.date|date:"j" }}</strong></div></div>
+  <div class="mini-body"><h3>{{ c.e.title }}</h3><p class="small muted">{{ c.e.venue_line }}</p><p class="small coral">{{ c.e.price_label }}</p></div>
+</a>

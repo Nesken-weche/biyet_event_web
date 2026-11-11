@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+{% block content %}
+<h1>History</h1>
+<div class="segmented">
+  {% for flt in filters %}<a class="{% if f == flt %}on{% endif %}" href="?f={{ flt }}">{{ flt }}{% for k, n in counts.items %}{% if k == flt and flt != 'All' and n %} <span class="count">{{ n }}</span>{% endif %}{% endfor %}</a>{% endfor %}
+</div>
+
+{% if not total %}
+  <section class="empty"><h2>No tickets yet</h2><p class="muted">Tickets you buy, or receive through Swap, show up here with their QR codes.</p><a class="btn" href="{% url 'events' %}">Browse events</a></section>
+{% elif not shown %}
+  <section class="empty"><h2>No {{ f|lower }} tickets</h2><p class="muted">You have {{ total }} {% if total == 1 %}ticket{% else %}tickets{% endif %} in other lists.</p><a class="btn" href="?f=All">Show all</a></section>
+{% else %}
+  {% if next_up %}
+    {% if f == 'All' %}<h2 class="section-title">Next up</h2>{% endif %}
+    <a class="ticket nextup" href="{% if next_up.ticket_id %}{% url 'ticket_detail' next_up.ticket_id %}{% else %}#{% endif %}" data-precache>
+      <div class="ticket-top">
+        <span class="pill pill-ink">{{ next_up.countdown }}</span>
+        <h2>{{ next_up.title }}</h2>
+        <p>{{ next_up.local_date|date:"D, M j, Y" }} · {{ next_up.local_date|date:"g:i A" }}</p>
+        {% if next_up.venue %}<p class="muted">{{ next_up.venue }}{% if next_up.city %}, {{ next_up.city }}{% endif %}</p>{% endif %}
+      </div>
+      <div class="ticket-perf" aria-hidden="true"></div>
+      <div class="ticket-bottom row-between"><span>🎟 {{ next_up.qty }} {% if next_up.qty == 1 %}ticket{% else %}tickets{% endif %}{% if next_up.received %} · received via Swap{% endif %}</span><strong>Show ticket ›</strong></div>
+    </a>
+  {% endif %}
+  {% if upcoming %}{% if f == 'All' %}<h2 class="section-title">Also coming up <span class="count-pill">{{ upcoming|length }}</span></h2>{% endif %}{% include "biyet/_history_rows.html" with rows=upcoming %}{% endif %}
+  {% if past %}{% if f == 'All' %}<h2 class="section-title">Past events <span class="count-pill">{{ past|length }}</span></h2>{% endif %}{% include "biyet/_history_rows.html" with rows=past %}{% endif %}
+  {% if cancelled %}{% if f == 'All' %}<h2 class="section-title">Cancelled <span class="count-pill">{{ cancelled|length }}</span></h2>{% endif %}{% include "biyet/_history_rows.html" with rows=cancelled %}{% endif %}
+  {% if other %}{% if f == 'All' %}<h2 class="section-title">Other orders <span class="count-pill">{{ other|length }}</span></h2>{% endif %}{% include "biyet/_history_rows.html" with rows=other %}{% endif %}
+{% endif %}
+{% endblock %}

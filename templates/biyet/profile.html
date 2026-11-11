@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Edit profile{% endblock %}
+{% block content %}
+<section class="form-page">
+  {% if blocking %}
+  <div class="panel">
+    <h1>Complete your profile</h1>
+    <p class="muted">Before you can buy tickets we need a few details to verify your identity and age.</p>
+    <p class="tiny muted">STILL NEEDED</p>
+    <ul class="needed">{% for m in missing %}<li>○ {{ m }}</li>{% endfor %}</ul>
+  </div>
+  {% else %}<h1>Edit profile</h1>{% endif %}
+
+  <div class="msg {% if verified %}msg-success{% else %}msg-warning{% endif %}">
+    {% if verified %}✔ Your profile is verified. Saving any change sends it back for review.
+    {% else %}⏳ Your details are reviewed by our team. Your profile stays unverified until it is approved.{% endif %}
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="stack" novalidate>
+    {% csrf_token %}
+    <div class="field"><label>Username</label><input name="username" value="{{ form.username }}" placeholder="e.g. jeanmarc" autocomplete="username">{% if errors.username %}<small class="error">{{ errors.username }}</small>{% endif %}</div>
+    <div class="field"><label>Phone number</label><input name="phoneNumber" value="{{ form.phoneNumber }}" type="tel" placeholder="+509 3700 0000" autocomplete="tel">{% if errors.phoneNumber %}<small class="error">{{ errors.phoneNumber }}</small>{% endif %}</div>
+    <div class="field"><label>Date of birth{% if age %} · <span class="muted">{{ age }} years old</span>{% endif %}</label><input name="DOB" type="date" value="{{ form.DOB }}">{% if errors.DOB %}<small class="error">{{ errors.DOB }}</small>{% endif %}</div>
+    <div class="field"><label>ID type</label>
+      <select name="idType"><option value="">Select ID type</option>{% for t in id_types %}<option {% if form.idType == t %}selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+      {% if errors.idType %}<small class="error">{{ errors.idType }}</small>{% endif %}</div>
+    <div class="field"><label>Photo of your ID</label>
+      {% if id_pic %}<img src="{{ id_pic }}" alt="Your ID" class="id-preview">{% endif %}
+      <input type="file" name="idPic" accept="image/*" capture="environment">
+      {% if errors.idPic %}<small class="error">{{ errors.idPic }}</small>{% endif %}</div>
+
+    <h2 class="section-title">Address</h2>
+    {% if haiti %}
+      <div class="field"><label>Department</label><select name="state" id="ht-dept"><option value="">Select department</option>{% for d in ht %}<option {% if form.state == d.name %}selected{% endif %}>{{ d.name }}</option>{% endfor %}</select>{% if errors.state %}<small class="error">{{ errors.state }}</small>{% endif %}</div>
+      <div class="field"><label>Arrondissement</label><select name="arr" id="ht-arr" data-value="{{ form.arr }}"></select>{% if errors.arr %}<small class="error">{{ errors.arr }}</small>{% endif %}</div>
+      <div class="field"><label>Commune</label><select name="city" id="ht-com" data-value="{{ form.city }}"></select>{% if errors.city %}<small class="error">{{ errors.city }}</small>{% endif %}</div>
+      {{ ht|json_script:"ht-data" }}
+    {% else %}
+      {% if usa %}<div class="field"><label>Street address</label><input name="street" value="{{ form.street }}" placeholder="123 Main St" autocomplete="street-address">{% if errors.street %}<small class="error">{{ errors.street }}</small>{% endif %}</div>{% endif %}
+      <div class="field"><label>City</label><input name="city" value="{{ form.city }}" autocomplete="address-level2">{% if errors.city %}<small class="error">{{ errors.city }}</small>{% endif %}</div>
+      <div class="row">
+        <div class="field grow"><label>{% if usa %}State{% else %}State / province{% endif %}</label>
+          {% if usa %}<select name="state"><option value="">Select state</option>{% for st in us_states %}<option {% if form.state == st %}selected{% endif %}>{{ st }}</option>{% endfor %}</select>
+          {% else %}<input name="state" value="{{ form.state }}">{% endif %}
+          {% if errors.state %}<small class="error">{{ errors.state }}</small>{% endif %}</div>
+        {% if usa %}<div class="field"><label>ZIP code</label><input name="zip" value="{{ form.zip }}" inputmode="numeric" maxlength="5" placeholder="46204">{% if errors.zip %}<small class="error">{{ errors.zip }}</small>{% endif %}</div>{% endif %}
+      </div>
+    {% endif %}
+    <button class="btn btn-block">Save</button>
+  </form>
+  {% if blocking %}<form method="post" action="{% url 'logout' %}" class="center">{% csrf_token %}<button class="linklike muted">Sign out</button></form>{% endif %}
+</section>
+{% endblock %}
+{% block scripts %}{% if haiti %}<script>
+(function(){const data=JSON.parse(document.getElementById('ht-data').textContent);
+const dept=document.getElementById('ht-dept'),arr=document.getElementById('ht-arr'),com=document.getElementById('ht-com');
+function fill(sel,opts,ph,val){sel.innerHTML='';sel.append(new Option(ph,''));opts.forEach(o=>sel.append(new Option(o,o,false,o===val)));sel.disabled=!opts.length;}
+function onDept(keep){const d=data.find(x=>x.name===dept.value);fill(arr,d?Object.keys(d.arrs):[],d?'Select arrondissement':'Pick a department first',keep?arr.dataset.value:'');onArr(keep);}
+function onArr(keep){const d=data.find(x=>x.name===dept.value);const coms=d&&d.arrs[arr.value]||[];fill(com,coms,arr.value?'Select commune':'Pick an arrondissement first',keep?com.dataset.value:(coms.length===1?coms[0]:''));}
+dept.addEventListener('change',()=>onDept(false));arr.addEventListener('change',()=>onArr(false));onDept(true);})();
+</script>{% endif %}{% endblock %}

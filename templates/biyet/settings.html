@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<section class="form-page">
+  <h1>Settings</h1>
+  <h2 class="section-title">What are you into?</h2>
+  <p class="muted small">Pick the kinds of events you like. We show them first.</p>
+  {% if types %}
+  <form method="post" class="chips">{% csrf_token %}
+    {% for t in types %}<button class="chip {% if t.on %}on{% endif %}" name="fav" value="{{ t.key }}">{% if t.on %}✓ {% endif %}{{ t.label }}</button>{% endfor %}
+  </form>
+  {% else %}<p class="muted small">No event types available yet.</p>{% endif %}
+
+  <h2 class="section-title">Notifications</h2>
+  <form method="post" class="panel row-between" id="notif-form">{% csrf_token %}
+    <div><strong>🔔 Push notifications</strong><p class="small muted">New events you like, ticket reminders and offers.</p></div>
+    <label class="switch"><input type="checkbox" name="notifications" id="notif-switch" {% if notifications %}checked{% endif %}><span></span></label>
+    <input type="hidden" name="notifications_form" value="1">
+  </form>
+  <p class="small" id="notif-msg" role="status"></p>
+  {% if not push_enabled %}<p class="tiny muted">Push on this device needs FIREBASE_VAPID_KEY (see README). You'll still see everything in Notifications.</p>
+  {% else %}<p class="tiny muted">On iPhone/iPad, add Biyet Event to your Home Screen first (Share → Add to Home Screen), then turn this on from the installed app.</p>{% endif %}
+  <p class="center tiny muted">Biyet Event · web</p>
+</section>
+{% endblock %}
+{% block scripts %}<script>
+(function () {
+  const sw = document.getElementById("notif-switch"), form = document.getElementById("notif-form"),
+        msg = document.getElementById("notif-msg");
+  sw.addEventListener("change", async () => {
+    // Same as the app: turning on asks permission first and saves this device's token.
+    if (sw.checked && window.biyetEnablePush) {
+      sw.disabled = true;
+      let r = "unsupported";
+      try { r = await window.biyetEnablePush(); } catch (_) {}
+      sw.disabled = false;
+      if (r === "blocked") {
+        sw.checked = false;
+        msg.textContent = "Notifications are blocked for this site. Allow them in your browser settings, then try again.";
+        return;
+      }
+      if (r === "unsupported") msg.textContent = "This browser can't receive push. You'll still see updates in Notifications.";
+    }
+    form.submit();
+  });
+})();
+</script>{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Swap{% endblock %}
+{% block content %}
+<div class="row-between">
+  <div><p class="tagline-eyebrow">⇄ Buy, sell and trade seats</p><h1>Swap</h1></div>
+  <a class="btn" href="{% url 'swap_new' %}">+ List a ticket</a>
+</div>
+<p class="muted">Get a ticket someone can't use, or pass on yours.</p>
+<div class="segmented">
+  <a class="{% if v == 'browse' %}on{% endif %}" href="?v=browse">Browse</a>
+  <a class="{% if v == 'mine' %}on{% endif %}" href="?v=mine">My swaps{% if badge %} <span class="count hot">{{ badge }}</span>{% endif %}</a>
+</div>
+
+{% if v == 'browse' %}
+  <div class="chips">
+    <a class="chip {% if not flt %}on{% endif %}" href="?v=browse">All <span class="count">{{ counts.all }}</span></a>
+    <a class="chip {% if flt == 'free' %}on{% endif %}" href="?v=browse&type=free">Free <span class="count">{{ counts.free }}</span></a>
+    <a class="chip {% if flt == 'sell' %}on{% endif %}" href="?v=browse&type=sell">For sale <span class="count">{{ counts.sell }}</span></a>
+    <a class="chip {% if flt == 'exchange' %}on{% endif %}" href="?v=browse&type=exchange">Trade <span class="count">{{ counts.exchange }}</span></a>
+  </div>
+  <div class="ticket-list">
+  {% for x in browse %}{% include "biyet/_swap_card.html" %}
+  {% empty %}<section class="empty"><h2>No tickets up for grabs</h2><p class="muted">Can't make it to an event? Tap “List a ticket” and someone else can use it.</p></section>{% endfor %}
+  </div>
+{% else %}
+  {% if needs %}<h2 class="section-title">Waiting for your answer <span class="count-pill hot">{{ needs|length }}</span></h2><div class="ticket-list">{% for x in needs %}{% include "biyet/_swap_card.html" %}{% endfor %}</div>{% endif %}
+  {% if requested %}<h2 class="section-title">You asked for</h2><div class="ticket-list">{% for x in requested %}{% include "biyet/_swap_card.html" %}{% endfor %}</div>{% endif %}
+  {% if listed %}<h2 class="section-title">Your listings</h2><div class="ticket-list">{% for x in listed %}{% include "biyet/_swap_card.html" %}{% endfor %}</div>{% endif %}
+  {% if done %}<h2 class="section-title">Done</h2><div class="ticket-list">{% for x in done %}{% include "biyet/_swap_card.html" %}{% endfor %}</div>{% endif %}
+  {% if not needs and not requested and not listed and not done %}<section class="empty"><h2>No swaps yet</h2><p class="muted">Tickets you list, and tickets you ask for, show up here.</p></section>{% endif %}
+{% endif %}
+{% endblock %}

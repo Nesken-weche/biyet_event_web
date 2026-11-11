@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+db.sqlite3
+staticfiles/
+firebase-service-account.json
+*-firebase-adminsdk-*.json
+.venv/
+fake_firestore.json
+*.json.bak
+serviceAccountKey.json
+*serviceAccount*.json

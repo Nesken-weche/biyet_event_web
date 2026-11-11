@@ -1,0 +1,19 @@
+<div class="ticket-list">
+{% for e in rows %}
+  <a class="ticket-stub {% if e.cancelled %}is-cancelled{% endif %}" href="{% if e.ticket_id and not e.cancelled %}{% url 'ticket_detail' e.ticket_id %}{% else %}#{% endif %}" {% if e.upcoming %}data-precache{% endif %}>
+    <div class="stub-date {% if not e.upcoming %}dim{% endif %}">{% if e.local_date %}<span>{{ e.local_date|date:"M" }}</span><strong>{{ e.local_date|date:"j" }}</strong>{% else %}🧾{% endif %}</div>
+    <div class="stub-body">
+      <h2>{{ e.title }}</h2>
+      <p class="muted">{% if e.local_date %}{{ e.local_date|date:"g:i A" }}{% elif e.bought %}Bought {{ e.bought|date:"M j, Y" }}{% endif %}{% if e.venue %} · {{ e.venue }}{% endif %} · {{ e.qty }} {% if e.qty == 1 %}ticket{% else %}tickets{% endif %}</p>
+      <div class="pills">
+        {% if e.cancelled %}<span class="pill pill-danger">{% if e.status == 'refunded' %}Refunded{% else %}Cancelled{% endif %}</span>
+        {% elif e.upcoming %}<span class="pill">{{ e.countdown }}</span>
+        {% elif e.past %}<span class="pill pill-dim">Ended</span>
+        {% else %}<span class="pill pill-dim">Paid</span>{% endif %}
+        {% if e.received %}<span class="pill pill-dim">⇄ via Swap</span>{% endif %}
+      </div>
+    </div>
+    <div class="right"><strong>{% if e.total %}${{ e.total|floatformat:2 }}{% else %}Free{% endif %}</strong>{% if e.ticket_id and not e.cancelled %}<span class="qr-mini {% if e.upcoming %}on{% endif %}">▦</span>{% endif %}</div>
+  </a>
+{% endfor %}
+</div>

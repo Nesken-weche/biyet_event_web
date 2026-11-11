@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Verify your account{% endblock %}
+{% block content %}
+<section class="auth-card center">
+  <img class="auth-logo" src="{% static 'img/logo-mark.svg' %}" alt="Biyet Event" width="72" height="72">
+  <h1>Check your email</h1>
+  <p class="muted">We sent a 6-digit code to <strong>{{ masked }}</strong>.</p>
+  <form method="post" class="stack">
+    {% csrf_token %}
+    <input class="code-input" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}" placeholder="••••••" autofocus oninput="if(this.value.replace(/\D/g,'').length===6)this.form.submit()">
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <button class="btn btn-block">Verify</button>
+  </form>
+  <form method="post" class="center">{% csrf_token %}<button class="linklike" name="resend" value="1">Send the code again</button></form>
+  <form method="post" action="{% url 'logout' %}" class="center" data-firebase-logout>{% csrf_token %}<button class="linklike muted small">Use a different account</button></form>
+</section>
+{% endblock %}

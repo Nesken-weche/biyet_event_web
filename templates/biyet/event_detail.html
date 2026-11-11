@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ e.title }}{% endblock %}
+{% block content %}
+<article class="detail">
+  {% if e.media %}
+  <div class="gallery" data-gallery>
+    <div class="gallery-track">
+      {% for m in e.media %}
+        {% if m.is_video %}<video src="{{ m.url }}" muted loop playsinline controls preload="metadata"></video>
+        {% else %}<img src="{{ m.url }}" alt="" loading="lazy">{% endif %}
+      {% endfor %}
+    </div>
+    {% if e.media|length > 1 %}<span class="tag tag-media">{{ e.media|length }} photos & videos · swipe</span>{% endif %}
+    {% if e.hot_event and not card.past %}<span class="tag tag-hot">🔥 Hot</span>{% endif %}
+  </div>
+  {% else %}
+  <div class="detail-cover"><span class="cover-emoji big">{{ card.emoji }}</span></div>
+  {% endif %}
+
+  <div class="detail-head">
+    <div class="datechip big-chip"><span>{{ date|date:"M" }}</span><strong>{{ date|date:"j" }}</strong></div>
+    <div>
+      {% if card.type_label %}<span class="pill pill-dim">{{ card.type_label }}</span>{% endif %}
+      <h1>{{ e.title }}</h1>
+    </div>
+  </div>
+
+  <dl class="facts">
+    <div><dt>When</dt><dd>{{ date|date:"D, M j, Y" }} · {{ date|date:"g:i A" }}</dd></div>
+    <div><dt>Where</dt><dd>{{ e.biz_name }}{% if place %}<br><span class="muted">{{ place }}</span>{% endif %}</dd></div>
+    {% if e.going_count %}<div><dt>Going</dt><dd>{{ e.going_count }} {% if e.going_count == 1 %}person{% else %}people{% endif %}</dd></div>{% endif %}
+    {% if e.can_get_tix %}<div><dt>Available</dt><dd>{% if e.is_sold_out %}Sold out{% elif e.tickets_left is None %}Open{% else %}{{ e.tickets_left }} left{% endif %}</dd></div>{% endif %}
+  </dl>
+
+  {% if e.imp_note %}<div class="msg msg-info">ℹ️ {{ e.imp_note }}</div>{% endif %}
+
+  {% if e.content %}<h2 class="section-title">About this event</h2><div class="prose">{{ e.content|linebreaks }}</div>{% endif %}
+
+  {% if e.can_get_tix and not card.disabled %}
+  <form method="post" action="{% url 'add_to_cart' e.id %}" class="tiers">
+    {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+    <h2 class="section-title">Tickets</h2>
+    {% for row in tiers %}
+      <label class="tier {% if row.sold_out %}is-out{% endif %}">
+        <input type="radio" name="tier_id" value="{{ row.t.tier_id }}" {% if row.sold_out %}disabled{% elif forloop.first %}checked{% endif %}>
+        <span class="tier-main"><strong>{{ row.t.name }}</strong>{% if row.t.description %}<span class="small muted">{{ row.t.description }}</span>{% endif %}</span>
+        <span class="tier-side"><strong>{{ row.price }}</strong><span class="small {% if row.sold_out %}danger{% else %}muted{% endif %}">{% if row.sold_out %}Sold out{% elif row.left is not None and row.left <= 20 %}Only {{ row.left }} left{% else %}Max {{ row.t.max_per_order }} / order{% endif %}</span></span>
+      </label>
+    {% endfor %}
+    <div class="cta">
+      <div><div class="price big">{{ e.price_label }}</div>{% if approx_price %}<div class="small muted">≈ {{ approx_price|floatformat:2 }} in your currency</div>{% endif %}</div>
+      <button class="btn">{% if card.in_cart %}Add another · {{ card.in_cart }} in cart{% else %}Add to cart{% endif %}</button>
+    </div>
+  </form>
+  {% else %}
+  <div class="cta"><div class="price big">{{ e.price_label }}</div><button class="btn" disabled>{{ card.cta }}</button></div>
+  {% endif %}
+
+  <details class="report">
+    <summary>⚑ Report this event</summary>
+    <form method="post" action="{% url 'report_event' e.id %}" class="stack">
+      {% csrf_token %}
+      {% for code, label in reasons %}<label class="radio"><input type="radio" name="reason" value="{{ code }}" required> {{ label }}</label>{% endfor %}
+      <textarea name="details" rows="3" maxlength="1000" placeholder="What happened? (required for “Something else”)"></textarea>
+      <button class="btn btn-ghost">Send report</button>
+    </form>
+  </details>
+</article>
+{% endblock %}

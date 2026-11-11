@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Biyet Event">
+  <!-- Ticket stub with side notches, tilted like it's being handed over -->
+  <g transform="rotate(-8 60 60)">
+    <path fill="#ff5a36" d="M22 18h76a10 10 0 0 1 10 10v20a12 12 0 0 0 0 24v20a10 10 0 0 1-10 10H22a10 10 0 0 1-10-10V72a12 12 0 0 0 0-24V28a10 10 0 0 1 10-10z"/>
+    <!-- perforation -->
+    <g fill="#0f0d1a" opacity=".35">
+      <circle cx="84" cy="30" r="2.6"/><circle cx="84" cy="42" r="2.6"/><circle cx="84" cy="54" r="2.6"/>
+      <circle cx="84" cy="66" r="2.6"/><circle cx="84" cy="78" r="2.6"/><circle cx="84" cy="90" r="2.6"/>
+    </g>
+    <!-- "B" built from geometry so it renders identically everywhere -->
+    <path fill="#0f0d1a" d="M32 34h22c10 0 16 5.5 16 13.2 0 5-2.7 8.6-6.8 10.3 5.4 1.5 8.8 5.6 8.8 11.4 0 8.6-6.6 14.1-17.2 14.1H32zm13 10.2v9.4h7.4c3.3 0 5.2-1.8 5.2-4.7s-1.9-4.7-5.2-4.7zm0 18.8v10.2h8.4c3.6 0 5.7-1.9 5.7-5.1s-2.1-5.1-5.7-5.1z"/>
+    <!-- spark: the fun -->
+    <path fill="#c6f26a" d="M96 60l2.6 6.4L105 69l-6.4 2.6L96 78l-2.6-6.4L87 69l6.4-2.6z" transform="translate(0 -32)"/>
+  </g>
+</svg>

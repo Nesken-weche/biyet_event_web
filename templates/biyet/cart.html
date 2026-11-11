@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}My cart{% endblock %}
+{% block content %}
+<h1>My cart</h1>
+{% if not lines %}
+  <section class="empty"><h2>Your cart is empty</h2><p class="muted">Find an event and get tickets.</p><a class="btn" href="{% url 'events' %}">Browse events</a></section>
+{% else %}
+  {% if not sm.can_pay %}<div class="msg msg-error">{{ sm.cant_pay_reason }}</div>{% endif %}
+  <div class="msg msg-info">🪙 You'll earn <strong>10 points</strong> on this purchase</div>
+
+  {% for row in lines %}
+  <div class="cart-card">
+    <div class="cart-head">
+      <div class="thumb" {% if row.image %}style="background-image:url('{{ row.image }}')"{% endif %}>{% if not row.image %}{{ row.emoji }}{% endif %}</div>
+      <div class="grow"><a href="{% url 'event_detail' row.ln.event.id %}"><strong>{{ row.ln.event.title }}</strong></a><div class="small muted">📅 {{ row.date|date:"M j" }}</div></div>
+      <form method="post" action="{% url 'cart_update' %}">{% csrf_token %}<input type="hidden" name="key" value="{{ row.ln.key }}"><button class="linklike muted" name="action" value="remove" aria-label="Remove">🗑</button></form>
+    </div>
+    {% if row.tiers %}
+    <form method="post" action="{% url 'cart_update' %}" class="chips scroll">{% csrf_token %}<input type="hidden" name="key" value="{{ row.ln.key }}"><input type="hidden" name="action" value="tier">
+      {% for t in row.tiers %}<button class="chip {% if t.selected %}on{% endif %} {% if not t.available and not t.selected %}struck{% endif %}" name="tier_id" value="{{ t.t.tier_id }}" {% if not t.available and not t.selected %}disabled{% endif %}>{{ t.t.name }}</button>{% endfor %}
+    </form>
+    {% endif %}
+    <div class="tier-info">🎟 <strong>{{ row.ln.tier.name }}</strong> · {{ row.price }} each{% if row.approx %} <span class="muted">({{ row.approx }})</span>{% endif %} · <span class="{% if row.ln.max_qty <= 0 %}danger{% else %}coral{% endif %}">{% if row.ln.max_qty <= 0 %}Sold out{% else %}Max {{ row.ln.max_qty }} per order{% endif %}</span></div>
+    {% if row.ln.disc %}<div class="disc">🏷 {{ row.disc_title }}{% if row.ln.disc.qty < row.ln.qty %} · on {{ row.ln.disc.qty }} of {{ row.ln.qty }}{% endif %}<span>−{{ row.disc_total }}</span></div>
+    {% elif row.ln.locked_hint %}<div class="small muted">🔒 {{ row.ln.locked_hint }}</div>{% endif %}
+    <div class="cart-foot">
+      <form method="post" action="{% url 'cart_update' %}" class="stepper">{% csrf_token %}<input type="hidden" name="key" value="{{ row.ln.key }}">
+        <button name="action" value="dec" {% if row.ln.qty <= 1 %}disabled{% endif %}>−</button><span>{{ row.ln.qty }}</span><button name="action" value="inc" class="plus" {% if row.at_max %}disabled{% endif %}>+</button>
+      </form>
+      {% if row.at_max %}<span class="small muted">{% if row.ln.max_qty <= 0 %}Sold out{% else %}Max reached{% endif %}</span>{% endif %}
+      <div class="right">{% if row.ln.disc %}<s class="small muted">{{ row.gross }}</s>{% endif %}<div class="price coral">{{ row.net }}</div>{% if row.net_approx %}<div class="small muted">{{ row.net_approx }}</div>{% endif %}</div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <h2 class="section-title">Payment method</h2>
+  <form method="post" action="{% url 'cart_update' %}" class="pay-options">{% csrf_token %}<input type="hidden" name="action" value="method">
+    <button class="pay {% if sm.method == 'wallet' %}on{% endif %}" name="method" value="wallet" {% if not sm.available.wallet %}disabled{% endif %}>
+      <strong>👛 Wallet</strong><span>Balance {{ fmt.wallet_balance }}{% if sm.available.wallet %} · No card fee{% else %} · Not enough for this order{% endif %}</span></button>
+    <button class="pay {% if sm.method == 'split' %}on{% endif %}" name="method" value="split" {% if not sm.available.split %}disabled{% endif %}>
+      <strong>⑂ Wallet + card</strong><span>{% if sm.available.wallet %}Not needed, your wallet covers this order{% elif sm.split_wallet_cents %}Use {{ fmt.split }} from wallet · card fee only on the rest{% else %}No wallet balance to use{% endif %}</span></button>
+    <button class="pay {% if sm.method == 'card' %}on{% endif %}" name="method" value="card">
+      <strong>💳 Card</strong><span>Card fee: 3% + $0.30{% if not card_enabled %} · not available on the web yet{% endif %}</span></button>
+  </form>
+
+  <div class="summary">
+    <div><span>Subtotal</span><span>{{ fmt.gross }}</span></div>
+    {% if sm.discount_cents %}<div class="green"><span>🏷 Discounts</span><span>−{{ fmt.discount }}</span></div>{% endif %}
+    <div><span>Service fee ({{ sm.fee_label }})</span><span>{{ fmt.fee }}</span></div>
+    {% if sm.points_used %}<div class="coral"><span>🪙 Points applied ({{ sm.points_used }} pts)</span><span>−{{ fmt.points }}</span></div>
+    {% elif sm.user_points %}<div class="muted small"><span>🪙 {{ sm.user_points }} pts ({{ fmt.points_worth }}) · not used: points apply from {{ sm.min_points }} pts</span><span></span></div>{% endif %}
+    {% if sm.card_fee_cents %}<div><span>Card fee (3% + $0.30 on {{ fmt.card_base }})</span><span>{{ fmt.card_fee }}</span></div>{% endif %}
+    <div class="total"><span>Total</span><span>{{ fmt.due }}</span></div>
+    {% if sm.wallet_applied_cents %}<div class="coral"><span>From wallet</span><span>{{ fmt.wallet_local }}</span></div>{% endif %}
+    {% if sm.card_charge_cents and sm.wallet_applied_cents %}<div class="muted"><span>Charged to card</span><span>{{ fmt.card_charge }}</span></div>{% endif %}
+  </div>
+
+  <button id="pay-btn" class="btn btn-block btn-lg" {% if not sm.can_pay %}disabled{% endif %}
+    data-start="{% url 'checkout_start' %}" data-complete="{% url 'checkout_complete' %}" data-cancel="{% url 'checkout_cancel' %}">{{ sm.button_text }}</button>
+  <p id="pay-status" class="small muted center" aria-live="polite"></p>
+  <p class="small muted center">🛡 Secured payment · Instant e-ticket delivery</p>
+
+  <dialog id="card-dialog" class="sheet">
+    <h2>Pay with card</h2>
+    <p class="muted small">Charging <strong id="card-amount"></strong></p>
+    <div id="card-element" class="card-element"></div>
+    <p id="card-error" class="error small" role="alert"></p>
+    <div class="row"><button id="card-cancel" class="btn btn-ghost" type="button">Cancel</button><button id="card-pay" class="btn" type="button">Pay</button></div>
+  </dialog>
+  {% csrf_token %}
+{% endif %}
+{% endblock %}
+{% block scripts %}{% if lines %}<script src="https://js.stripe.com/v3/" async></script><script src="{% static 'js/checkout.js' %}" defer></script>{% endif %}{% endblock %}

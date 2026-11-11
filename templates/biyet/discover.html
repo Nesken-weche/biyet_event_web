@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Discover{% endblock %}
+{% block content %}
+<div class="row-between">
+  <h1>Discover</h1>
+  <button class="btn btn-sm btn-ghost" type="button" onclick="document.getElementById('filters').toggleAttribute('hidden')">Filters{% if filtering %} •{% endif %}</button>
+</div>
+
+<form id="filters" class="panel stack" method="get" {% if not filtering %}hidden{% endif %}>
+  <div class="field"><label>From date</label><input type="date" name="from" value="{{ f_from }}"></div>
+  <div class="field"><label>Sort</label>
+    <select name="sort">
+      <option value="" {% if not f_sort %}selected{% endif %}>Soonest first</option>
+      <option value="price_low" {% if f_sort == 'price_low' %}selected{% endif %}>Price: low to high</option>
+      <option value="price_high" {% if f_sort == 'price_high' %}selected{% endif %}>Price: high to low</option>
+    </select>
+  </div>
+  {% if types %}<div class="chips">{% for key, label in types %}<label class="chip {% if key in f_types %}on{% endif %}"><input type="checkbox" name="type" value="{{ key }}" {% if key in f_types %}checked{% endif %}>{{ label }}</label>{% endfor %}</div>{% endif %}
+  <div class="row"><button class="btn">Apply</button>{% if filtering %}<a class="btn btn-ghost" href="{% url 'discover' %}">Clear all</a>{% endif %}</div>
+</form>
+
+{% if filtering %}
+  <p class="muted small">{{ results|length }} {% if results|length == 1 %}event{% else %}events{% endif %}</p>
+  <div class="grid">{% for c in results %}{% include "biyet/_card.html" %}{% empty %}<p class="muted">No events match these filters.</p>{% endfor %}</div>
+{% elif not top %}
+  <section class="empty"><h2>Nothing to discover yet</h2><p class="muted">When promoters in your country publish events, the best picks show up here.</p></section>
+{% else %}
+  <h2 class="section-title">Top pick{% if place %} in {{ place }}{% endif %}</h2>
+  <a class="feature" href="{% url 'event_detail' top.e.id %}" {% if top.image %}style="background-image:linear-gradient(transparent 30%,#000d),url('{{ top.image }}')"{% endif %}>
+    <div class="datechip"><span>{{ top.date|date:"M" }}</span><strong>{{ top.date|date:"j" }}</strong></div>
+    <div class="feature-body"><span class="tag tag-price">{{ top.e.price_label }}</span><h3>{{ top.e.title }}</h3><p>{{ top.e.venue_line }}{% if top.e.going_count %} · {{ top.e.going_count }} going{% endif %}</p></div>
+  </a>
+
+  {% if for_you %}<h2 class="section-title">For you</h2><div class="carousel">{% for c in for_you %}{% include "biyet/_mini.html" %}{% endfor %}</div>{% endif %}
+  {% if weekend %}<h2 class="section-title">This weekend</h2><div class="carousel">{% for c in weekend %}{% include "biyet/_mini.html" %}{% endfor %}</div>{% endif %}
+  {% if trending %}<h2 class="section-title">Trending</h2><div class="carousel">{% for c in trending %}{% include "biyet/_mini.html" %}{% endfor %}</div>{% endif %}
+  {% if free %}<h2 class="section-title">Free to get in</h2><div class="carousel">{% for c in free %}{% include "biyet/_mini.html" %}{% endfor %}</div>{% endif %}
+
+  {% if vibes %}
+  <h2 class="section-title">Browse by vibe</h2>
+  <div class="vibes">
+    {% for v in vibes %}<a class="vibe" href="?type={{ v.key }}"><span class="vibe-emoji">{{ v.emoji }}</span><strong>{{ v.label }}</strong><span class="small muted">{{ v.count }} {% if v.count == 1 %}event{% else %}events{% endif %}</span></a>{% endfor %}
+  </div>
+  {% endif %}
+{% endif %}
+{% endblock %}

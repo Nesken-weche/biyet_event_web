@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<div class="row-between">
+  <h1>Notifications</h1>
+  {% if unread %}<form method="post" action="{% url 'notif_read' %}">{% csrf_token %}<input type="hidden" name="all" value="1"><button class="linklike">Mark all read</button></form>{% endif %}
+</div>
+<div class="chips">
+  <a class="chip {% if f == 'all' %}on{% endif %}" href="?f=all">All {% if count_all %}<span class="count">{{ count_all }}</span>{% endif %}</a>
+  <a class="chip {% if f == 'personal' %}on{% endif %}" href="?f=personal">For you {% if count_personal %}<span class="count">{{ count_personal }}</span>{% endif %}</a>
+  <a class="chip {% if f == 'news' %}on{% endif %}" href="?f=news">News {% if count_news %}<span class="count">{{ count_news }}</span>{% endif %}</a>
+</div>
+{% regroup items by group as groups %}
+{% for g in groups %}
+  <h2 class="section-title small-title">{{ g.grouper|upper }}</h2>
+  {% for i in g.list %}
+  <details class="notif {% if not i.read %}unread{% endif %}">
+    <summary>
+      <span class="notif-icon">{% if i.image %}<img src="{{ i.image }}" alt="">{% else %}{{ i.icon }}{% endif %}</span>
+      <span class="grow"><strong>{% if i.pinned %}📌 {% endif %}{{ i.title|default:"Notification" }}</strong><span class="small muted clamp">{{ i.body }}</span><span class="tiny {% if i.personal %}gold{% else %}muted{% endif %}">{% if i.personal %}For you{% else %}News{% endif %} · {{ i.created|timesince }} ago</span></span>
+      {% if not i.read %}<span class="dot"></span>{% endif %}
+    </summary>
+    <div class="notif-body">
+      {% if i.image %}<img src="{{ i.image }}" alt="" class="notif-img">{% endif %}
+      <p>{{ i.body|linebreaksbr }}</p>
+      <form method="post" action="{% url 'notif_read' %}" class="row">{% csrf_token %}<input type="hidden" name="id" value="{{ i.id }}"><input type="hidden" name="next" value="{{ i.href|default:request.get_full_path }}">
+        <button class="btn btn-sm">{% if i.href %}Open{% else %}Mark read{% endif %}</button></form>
+    </div>
+  </details>
+  {% endfor %}
+{% empty %}
+  <section class="empty"><h2>You're all caught up</h2><p class="muted">{% if f == 'personal' %}Updates about your tickets, swaps and rewards show up here.{% else %}New events, offers and news show up here.{% endif %}</p></section>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Your ticket · {{ d.title }}{% endblock %}
+{% block content %}
+<section class="ticket" id="ticket" data-status-url="{% url 'ticket_status' tid %}" data-status="{{ status }}">
+  <div class="ticket-top">
+    {% if d.image %}<div class="ticket-img" style="background-image:url('{{ d.image }}')"></div>{% endif %}
+    <p class="eyebrow">Biyet Event · {{ tier }}</p>
+    <h1>{{ d.title|default:"Event" }}</h1>
+    {% if date %}<p>{{ date|date:"D, M j, Y" }}{% if start_time %} · {{ start_time }}{% else %} · {{ date|date:"g:i A" }}{% endif %}</p>{% endif %}
+    {% if d.bizName %}<p class="muted">📍 {{ d.bizName }}</p>{% endif %}
+    {% if address %}<p class="muted small">{{ address }}</p>{% endif %}
+  </div>
+  <div class="ticket-perf" aria-hidden="true"></div>
+  <div class="ticket-bottom">
+    <div class="qr {% if not usable %}qr-void{% endif %}">{{ qr|safe }}{% if not usable %}<span class="qr-stamp tone-{{ tone }}">{{ label|upper }}</span>{% endif %}</div>
+    <button class="code linklike" type="button" data-copy="{{ tid }}">{{ tid }} ⧉</button>
+    <div class="stats">
+      <div><span>Admits</span><strong>{{ qty }} {% if qty == 1 %}person{% else %}people{% endif %}</strong></div>
+      <div><span>Paid</span><strong>{% if price %}${{ price|floatformat:2 }}{% else %}Free{% endif %}</strong></div>
+      <div><span>Status</span><strong class="tone-{{ tone }}" id="ticket-status">{{ label }}</strong></div>
+    </div>
+  </div>
+</section>
+<p class="muted small center">
+  {% if usable %}Show this QR code at the door. Turn your screen brightness up for faster scanning. Saved on this device, so it works offline.
+  {% elif status == 'transferred' %}You transferred this ticket through Swap. Its QR code no longer works.
+  {% else %}This ticket can no longer be used for entry.{% endif %}
+</p>
+{% if usable %}<p class="center"><a class="linklike" href="{% url 'swap_new' %}">Can't go? List it on Swap</a></p>{% endif %}
+{% endblock %}

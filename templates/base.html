@@ -1,0 +1,91 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}Kote plezi a ye{% endblock %} · Biyet Event</title>
+  <meta name="description" content="Biyet Event — kote plezi a ye. Find events, grab tickets, swap seats.">
+  <meta name="theme-color" content="#0f0d1a">
+  <link rel="manifest" href="{% url 'manifest' %}">
+  <!-- Biyet Event icon: browser tab, bookmarks, iPhone home screen -->
+  <link rel="icon" type="image/png" href="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png">
+  <link rel="shortcut icon" href="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png">
+  <link rel="apple-touch-icon" href="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png">
+  <!-- Preview when a Biyet link is shared (WhatsApp, Facebook, iMessage, X...) -->
+  <meta property="og:site_name" content="Biyet Event">
+  <meta property="og:title" content="{% block og_title %}Biyet Event — Kote plezi a ye{% endblock %}">
+  <meta property="og:description" content="Find events, grab tickets, swap seats.">
+  <meta property="og:image" content="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png">
+  <meta name="application-name" content="Biyet Event">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=JetBrains+Mono:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Biyet Event — home">
+      <img class="brand-mark" src="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png" alt="Biyet Event" style="width:auto;height:40px;object-fit:contain;">
+      <span class="brand-text"><span class="brand-name">biyet</span><span class="brand-sub">event</span></span>
+    </a>
+    {% if user.is_authenticated and tab %}
+    <nav class="topnav">
+      <a href="{% url 'events' %}" class="{% if tab == 'events' %}on{% endif %}">Events</a>
+      <a href="{% url 'history' %}" class="{% if tab == 'history' %}on{% endif %}">History</a>
+      <a href="{% url 'discover' %}" class="{% if tab == 'discover' %}on{% endif %}">Discover</a>
+      <a href="{% url 'swap' %}" class="{% if tab == 'swap' %}on{% endif %}">Swap</a>
+    </nav>
+    <div class="top-actions">
+      <a class="icon-btn {% if tab == 'cart' %}on{% endif %}" href="{% url 'cart' %}" aria-label="Cart">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+        {% if cart_count %}<span class="badge">{% if cart_count > 9 %}9+{% else %}{{ cart_count }}{% endif %}</span>{% endif %}
+      </a>
+      <a class="avatar {% if tab == 'menu' %}on{% endif %}" href="{% url 'menu' %}" aria-label="Menu">{{ initials }}{% if notif_dot %}<span class="dot"></span>{% endif %}</a>
+    </div>
+    {% elif not user.is_authenticated %}
+      <a class="btn btn-sm" href="{% url 'login' %}">Sign in</a>
+    {% endif %}
+  </header>
+
+  <div id="offline-banner" class="offline-banner" hidden>You're offline — showing saved pages.</div>
+  <button id="install-btn" class="install-btn" hidden>Install app</button>
+
+  {% if messages %}
+  <div class="messages">
+    {% for m in messages %}<div class="msg msg-{{ m.tags }}">{{ m }}{% if m.tags == 'success' and 'added to cart' in m.message %} · <a href="{% url 'cart' %}">View cart</a>{% endif %}</div>{% endfor %}
+  </div>
+  {% endif %}
+
+  <main class="container">{% block content %}{% endblock %}</main>
+
+  <footer class="footer">
+    <img src="{% static 'img/logo-mark.svg' %}" alt="" width="28" height="28">
+    <span><strong>Biyet Event</strong> · <em>Kote plezi a ye</em></span>
+  </footer>
+
+  {% if user.is_authenticated and tab %}
+  <nav class="tabbar" aria-label="Primary">
+    <a href="{% url 'events' %}" class="{% if tab == 'events' %}active{% endif %}"><span>▦</span>Events</a>
+    <a href="{% url 'history' %}" class="{% if tab == 'history' %}active{% endif %}"><span>🎟</span>History</a>
+    <a href="{% url 'discover' %}" class="{% if tab == 'discover' %}active{% endif %}"><span>✦</span>Discover</a>
+    <a href="{% url 'swap' %}" class="{% if tab == 'swap' %}active{% endif %}"><span>⇄</span>Swap</a>
+  </nav>
+  <form method="post" action="{% url 'logout' %}" id="logout-form" data-firebase-logout hidden>{% csrf_token %}</form>
+  {% endif %}
+
+  {{ firebase_web_config|json_script:"firebase-config" }}
+  <script src="{% static 'js/app.js' %}" defer></script>
+  {% if firebase_enabled %}<script type="module" src="{% static 'js/auth.js' %}"></script>{% endif %}
+  {% if push_enabled and user.is_authenticated %}
+  <span id="push-config" hidden data-vapid="{{ vapid_key }}" data-url="{% url 'device_token' %}"></span>
+  <script type="module" src="{% static 'js/push.js' %}"></script>
+  {% endif %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>

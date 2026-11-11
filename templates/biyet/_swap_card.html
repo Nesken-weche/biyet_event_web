@@ -1,0 +1,30 @@
+<div class="swap-card">
+  <div class="swap-head">
+    <div class="stub-date">{% if x.local_date %}<span>{{ x.local_date|date:"M" }}</span><strong>{{ x.local_date|date:"j" }}</strong>{% endif %}</div>
+    <div class="grow">
+      <h3>{{ x.event_title }}</h3>
+      <p class="small muted">{{ x.local_date|date:"D, M j · g:i A" }}{% if x.event_venue %} · {{ x.event_venue }}{% endif %}{% if x.event_city %}, {{ x.event_city }}{% endif %}</p>
+    </div>
+    <div class="right"><span class="pill {% if x.type == 'sell' %}{% elif x.type == 'free' %}pill-lime{% else %}pill-dim{% endif %}">{{ x.price_text }}</span>{% if x.price_note %}<span class="small muted">{{ x.price_note }}</span>{% endif %}</div>
+  </div>
+  <p class="small"><span class="avatar-dot" style="background:{{ x.poster_avatar|default:'#ff5a36' }}"></span>{{ x.poster_name|default:"Someone" }} · {{ x.type_text }}{% if x.quantity > 1 %} · admits {{ x.quantity }}{% endif %}{% if x.listed_at %} · {{ x.listed_at|timesince }} ago{% endif %}</p>
+  {% if x.exchange_for %}<p class="small">Wants: <strong>{{ x.exchange_for }}</strong></p>{% endif %}
+  {% if x.note %}<p class="small muted">“{{ x.note }}”</p>{% endif %}
+  <form method="post" action="{% url 'swap_action' x.id %}" class="row">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+    {% if x.status == 'open' and x.poster_id != me %}
+      <button class="btn btn-sm" name="action" value="claim" onclick="return confirm('Ask {{ x.poster_name|escapejs }} for this ticket?{% if x.type == 'sell' %} You pay them directly before they transfer it.{% endif %}')">{% if x.type == 'free' %}Claim it{% elif x.type == 'sell' %}Ask to buy{% else %}Offer a trade{% endif %}</button>
+    {% elif x.status == 'pending' and x.claimed_by_uid == me %}
+      <span class="small coral">Waiting for {{ x.poster_name }}</span>
+      <button class="btn btn-sm btn-ghost" name="action" value="withdraw" onclick="return confirm('Withdraw your request?')">Withdraw</button>
+    {% elif x.status == 'pending' and x.poster_id == me %}
+      <span class="small"><strong>{{ x.claimed_by_name|default:"Someone" }}</strong> asked for it</span>
+      <button class="btn btn-sm" name="action" value="accept" onclick="return confirm('Transfer your ticket? {{ x.claimed_by_name|default:"They"|escapejs }} gets a new ticket and your QR code stops working.{% if x.type == 'sell' %} Only accept once you have been paid.{% elif x.type == 'exchange' %} Only accept once the trade is done.{% endif %}')">Transfer ticket</button>
+      <button class="btn btn-sm btn-ghost" name="action" value="decline">Decline</button>
+    {% elif x.status == 'open' and x.poster_id == me %}
+      <span class="small muted">Listed</span>
+      <button class="btn btn-sm btn-ghost" name="action" value="cancel" onclick="return confirm('Remove this listing? You keep your ticket.')">Remove</button>
+    {% elif x.status == 'closed' %}
+      <span class="pill pill-dim">{% if x.poster_id == me %}Transferred to {{ x.claimed_by_name|default:"buyer" }}{% else %}Received · in your History{% endif %}</span>
+    {% endif %}
+  </form>
+</div>

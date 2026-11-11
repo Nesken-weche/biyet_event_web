@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Offline{% endblock %}
+{% block content %}
+<section class="empty">
+  <img src="{% static 'img/logo-mark.svg' %}" alt="" width="72" height="72">
+  <h1>You're offline</h1>
+  <p class="muted">This page isn't saved yet. Tickets you've opened before are still available.</p>
+  <a class="btn" href="/history/">Open my tickets</a>
+</section>
+{% endblock %}

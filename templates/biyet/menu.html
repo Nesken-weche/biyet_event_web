@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Menu{% endblock %}
+{% block content %}
+<section class="profile-hero">
+  <div class="avatar big">{{ initials }}</div>
+  <div>
+    <h1>{{ name }}</h1>
+    <p class="muted small">{{ handle }}</p>
+    <span class="pill">★ Red Carpet Member</span>
+  </div>
+</section>
+
+<div class="bal-row">
+  <div class="bal"><span class="muted small">👛 Balance</span><strong>{{ balance }}</strong></div>
+  <div class="bal gold"><span class="muted small">★ Points</span><strong>{{ points }}</strong></div>
+</div>
+
+<h2 class="section-title">Upcoming tickets</h2>
+<div class="ticket-list">
+{% for t in upcoming %}
+  <a class="ticket-stub" href="{% url 'ticket_detail' t.id %}" data-precache>
+    <div class="stub-date"><span>{{ t.local|date:"M" }}</span><strong>{{ t.local|date:"j" }}</strong></div>
+    <div class="stub-body"><h2>{{ t.title }}</h2><p class="muted">{{ t.quantity }} ticket{{ t.quantity|pluralize }}{% if t.venue %} · {{ t.venue }}{% endif %}</p></div>
+    <span class="pill">Confirmed</span>
+  </a>
+{% empty %}<p class="muted small">No upcoming events</p>{% endfor %}
+</div>
+
+{% if transport %}
+<h2 class="section-title">Travel</h2>
+<div class="travel-card">
+  {% if transport_city %}<span class="pill pill-ink">★ Available in {{ transport_city }}</span>{% endif %}
+  <strong>🚌 Transportation</strong><span class="small">{{ transport|join:" · " }} near you — book trips in the Biyet Event app.</span>
+</div>
+{% endif %}
+
+<h2 class="section-title">Account</h2>
+<nav class="menu-list">
+  <a href="{% url 'profile' %}">👤 Edit profile <span>›</span></a>
+  <a href="{% url 'notifications' %}">🔔 Notifications {% if unread %}<em class="count hot">{{ unread }}</em>{% endif %}<span>›</span></a>
+  <a href="{% url 'history' %}">🎟 All my tickets <span>›</span></a>
+  <a href="{% url 'rewards' %}">🎁 Referrals & rewards <span>›</span></a>
+  <a href="{% url 'rewards' %}#invite">➕ Invite friends <span>›</span></a>
+  <a href="{% url 'settings' %}">⚙️ Settings <span>›</span></a>
+  <a href="{% url 'events' %}" title="Open any event and use “Report this event”">⚑ Report a problem <span>›</span></a>
+</nav>
+<nav class="menu-list">
+  <button form="logout-form" class="coral">↩ Sign out</button>
+  <form method="post" action="{% url 'delete_account' %}" onsubmit="return confirm('Delete your account? You won\'t be able to sign in or use your tickets after this.')">{% csrf_token %}<button class="danger">⊖ Delete account</button></form>
+</nav>
+{% endblock %}

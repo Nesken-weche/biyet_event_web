@@ -1,0 +1,273 @@
+[
+ {
+  "name": "Artibonite",
+  "arrs": {
+   "Dessalines": [
+    "Dessalines",
+    "Desdunes",
+    "Grande Saline",
+    "Petit Rivière de l'Artibonite"
+   ],
+   "Gonaives": [
+    "Gonaives",
+    "Ennery",
+    "L'Estère"
+   ],
+   "Gros Morne": [
+    "Anse Rouge",
+    "Gros-Morne",
+    "Terre Neuve"
+   ],
+   "Marmelade": [
+    "Marmelade",
+    "Saint Michel de l'Attalaye"
+   ],
+   "Saint Marc": [
+    "Saint Marc",
+    "La Chapelle",
+    "Verrettes",
+    "Liancourt",
+    "Les Arcadins",
+    "Montrouis"
+   ]
+  }
+ },
+ {
+  "name": "Centre",
+  "arrs": {
+   "Hinche": [
+    "Hinche",
+    "Cerca Carvajal",
+    "Maissade",
+    "Thomonde"
+   ],
+   "Lascahobas": [
+    "Lascahobas",
+    "Baptiste",
+    "Belladere",
+    "Savanette"
+   ],
+   "Mirebalais": [
+    "Mirebalais",
+    "Saut-d'Eau",
+    "Boucan Carré"
+   ],
+   "Cerca La Source": [
+    "Cerca-la-Source",
+    "Thomassique"
+   ]
+  }
+ },
+ {
+  "name": "Grand Anse",
+  "arrs": {
+   "Anse d'Hainault": [
+    "Anse d'Hainault",
+    "Dame Marie",
+    "Les Irois"
+   ],
+   "Corail": [
+    "Beaumont",
+    "Corail",
+    "Pestel",
+    "Roseaux"
+   ],
+   "Jeremie": [
+    "Jeremie",
+    "Abricots",
+    "Bonbon",
+    "Chambellan",
+    "Marfranc",
+    "Moron"
+   ]
+  }
+ },
+ {
+  "name": "Nippes",
+  "arrs": {
+   "Anse a Veau": [
+    "Anse à Veau",
+    "Arnaud",
+    "L'Asile",
+    "Petit Trou de Nippes",
+    "Plaisance du Sud"
+   ],
+   "Baraderes": [
+    "Baradères",
+    "Grand Boucan"
+   ],
+   "Miragoane": [
+    "Miragoâne",
+    "Fonds des Nègres",
+    "Paillant",
+    "Petite Rivière de Nippes"
+   ]
+  }
+ },
+ {
+  "name": "Nord",
+  "arrs": {
+   "Acul Du Nord": [
+    "Acul Du Nord"
+   ],
+   "Borgne": [
+    "Borgne"
+   ],
+   "Cap Haitien": [
+    "Cap Haitien"
+   ],
+   "Grand Riviere du Nord": [
+    "Grand Riviere du Nord"
+   ],
+   "Limbe": [
+    "Limbe"
+   ],
+   "Plaisance": [
+    "Plaisance"
+   ],
+   "Saint Raphael": [
+    "Saint Raphael"
+   ]
+  }
+ },
+ {
+  "name": "Nord-Ouest",
+  "arrs": {
+   "Mole St Nicholas": [
+    "Môle Saint Nicolas",
+    "Baie de Henne",
+    "Bombardopolis",
+    "Jean Rabel"
+   ],
+   "Port de Paix": [
+    "Port-de-Paix",
+    "Bassin Bleu",
+    "Chansolme",
+    "Lapointe",
+    "La Tortue"
+   ],
+   "St Louis du Nord": [
+    "Saint Louis du Nord",
+    "Anse à Foleur"
+   ]
+  }
+ },
+ {
+  "name": "Nord-Est",
+  "arrs": {
+   "Fort Liberte": [
+    "Fort-Liberté",
+    "Ferrier",
+    "Perches"
+   ],
+   "Ouanaminthe": [
+    "Ouanaminthe",
+    "Capotille",
+    "Mont Organisé"
+   ],
+   "Trou du Nord": [
+    "Trou-du-Nord",
+    "Caracol",
+    "Sainte Suzanne",
+    "Grand Bassin",
+    "Terrier Rouge"
+   ],
+   "Vallieres": [
+    "Vallieres",
+    "Mombin Crochu",
+    "Carice"
+   ]
+  }
+ },
+ {
+  "name": "Ouest",
+  "arrs": {
+   "Arcahaie": [
+    "Arcahaie",
+    "Cabaret"
+   ],
+   "Croix des Bouquets": [
+    "Croix des Bouquets",
+    "Thomazeau",
+    "Ganthier",
+    "Fonds Verrettes",
+    "Cornillon",
+    "Canaan"
+   ],
+   "Gonave": [
+    "Anse à Galets",
+    "Pointe à Raquette"
+   ],
+   "Leogane": [
+    "Léogâne",
+    "Grand Goâve",
+    "Petit Goâve"
+   ],
+   "Port Au Prince": [
+    "Port Au Prince",
+    "Carrefour",
+    "Cité Soleil",
+    "Delmas",
+    "Gressier",
+    "Kenscoff",
+    "Pétion Ville",
+    "Tabarre"
+   ]
+  }
+ },
+ {
+  "name": "Sud-Est",
+  "arrs": {
+   "Bainet": [
+    "Bainet",
+    "Côtes de Fer"
+   ],
+   "Belle Anse": [
+    "Belle Anse",
+    "Anse à Pitres",
+    "Grand Gosier",
+    "Thiotte"
+   ],
+   "Jacmel": [
+    "Jacmel",
+    "Cayes Jacmel",
+    "La Vallée",
+    "Marigot"
+   ]
+  }
+ },
+ {
+  "name": "Sud",
+  "arrs": {
+   "Aquin": [
+    "Aquin",
+    "Cavaillon",
+    "Saint Louis du Sud",
+    "Fond des Blancs"
+   ],
+   "Chardonnieres": [
+    "Chardonnières",
+    "Les Anglais",
+    "Tiburon"
+   ],
+   "Coteaux": [
+    "Côteaux",
+    "Port à Piment",
+    "Roche à Bateaux"
+   ],
+   "Les Cayes": [
+    "Les Cayes",
+    "Camp Perrin",
+    "Chantal",
+    "Île à Vache",
+    "Maniche",
+    "Torbeck"
+   ],
+   "Port Salut": [
+    "Port Salut",
+    "Arniquet",
+    "Saint Jean du Sud"
+   ]
+  }
+ }
+]

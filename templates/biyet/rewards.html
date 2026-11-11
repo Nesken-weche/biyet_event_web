@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Referrals & rewards{% endblock %}
+{% block content %}
+<h1>Referrals & rewards</h1>
+<div class="segmented">
+  <a class="{% if sub != 'rewards' %}on{% endif %}" href="?tab=referral">Referral</a>
+  <a class="{% if sub == 'rewards' %}on{% endif %}" href="?tab=rewards">Rewards</a>
+</div>
+
+{% if sub != 'rewards' %}
+<section class="center stack" id="invite">
+  <h2>Invite your friends</h2>
+  <p class="muted">Share your code. Your friends enter it when they sign up.</p>
+  <div class="code-card">
+    {% if code %}<span class="tiny muted">YOUR CODE</span><strong class="big-code">{{ code }}</strong>
+      <button class="linklike" type="button" data-copy="{{ code }}">⧉ Copy code</button>
+    {% else %}<p class="muted">You don't have a referral code yet. Contact support to get one.</p>{% endif %}
+  </div>
+  <button class="btn btn-block" type="button" data-share="{{ invite }}" data-share-title="Join me on Biyet Event">Send invite</button>
+  <ol class="steps"><li>Send your code by text, WhatsApp or email.</li><li>Your friend signs up and enters your code.</li><li>You'll find any rewards you earn in the Rewards tab.</li></ol>
+</section>
+{% else %}
+<div class="points-card"><span class="muted small">★ Points balance</span><strong>{{ points }}</strong></div>
+<h2 class="section-title small-title">YOUR COUPONS</h2>
+{% for cp in coupons %}
+<div class="coupon {% if not cp.usable %}dim{% endif %}">
+  <div class="coupon-stub">{{ cp.label }}</div>
+  <div class="grow"><strong>{{ cp.title }}</strong>{% if cp.desc %}<p class="small muted">{{ cp.desc }}</p>{% endif %}
+    <p class="small"><code>{{ cp.code }}</code> <span class="muted">{% if cp.used %}Used{% elif cp.expired %}Expired{% elif cp.expires %}Until {{ cp.expires|date:"M j, Y" }}{% else %}No expiry{% endif %}</span></p></div>
+  {% if cp.usable %}<button class="linklike" type="button" data-copy="{{ cp.code }}">⧉</button>{% endif %}
+</div>
+{% empty %}<section class="empty"><p class="muted">No coupons right now. Check back soon!</p></section>{% endfor %}
+{% endif %}
+{% endblock %}

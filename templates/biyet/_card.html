@@ -1,0 +1,32 @@
+{# One event card. Expects `c` (views.card_ctx). #}
+<article class="event-card {% if c.past %}is-past{% endif %} {% if c.in_cart %}in-cart{% endif %}">
+  <a class="event-link" href="{% url 'event_detail' c.e.id %}">
+    <div class="event-cover" {% if c.image %}style="background-image:url('{{ c.image }}')"{% endif %}>
+      {% if not c.image %}<span class="cover-emoji">{{ c.emoji }}</span>{% endif %}
+      <div class="datechip"><span>{{ c.date|date:"M" }}</span><strong>{{ c.date|date:"j" }}</strong></div>
+      {% if c.e.hot_event and not c.past %}<span class="tag tag-hot">🔥 Hot</span>{% endif %}
+      {% if c.type_label %}<span class="tag tag-type">{{ c.type_label }}</span>{% endif %}
+      {% if c.media_count > 1 or c.has_video %}<span class="tag tag-media">{{ c.media_count }} {% if c.has_video %}▶{% else %}▣{% endif %}</span>{% endif %}
+    </div>
+    <div class="event-body">
+      <h2>{{ c.e.title }}</h2>
+      {% if c.e.venue_line %}<p class="meta">📍 {{ c.e.venue_line }}</p>{% endif %}
+      <p class="meta">🕒 {{ c.date|date:"D" }} · {{ c.date|date:"g:i A" }}{% if c.e.going_count %} · {{ c.e.going_count }} going{% endif %}</p>
+    </div>
+  </a>
+  <div class="event-foot">
+    <div>
+      <div class="price">{{ c.e.price_label }}</div>
+      <div class="small {% if c.note %}warn{% else %}muted{% endif %}">{% if c.note %}{{ c.note }}{% elif c.e.can_get_tix %}General admission{% else %}Free entry{% endif %}</div>
+    </div>
+    {% if c.disabled %}
+      <button class="btn btn-sm" disabled>{{ c.cta }}</button>
+    {% elif c.e.can_get_tix %}
+      <form method="post" action="{% url 'add_to_cart' c.e.id %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn btn-sm {% if c.in_cart %}btn-ghost-coral{% endif %}">{% if c.in_cart %}✓ {% endif %}{{ c.cta }}</button>
+      </form>
+    {% else %}
+      <a class="btn btn-sm btn-ghost" href="{% url 'event_detail' c.e.id %}">{{ c.cta }}</a>
+    {% endif %}
+  </div>
+</article>

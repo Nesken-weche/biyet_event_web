@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Events{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="tagline-eyebrow">{% if city %}📍 {{ city }}{% else %}Biyet Event{% endif %}</p>
+  <!-- <h1 class="tagline">Kote plezi<br>a ye<span class="spark">✦</span></h1> -->
+  <form method="get" class="search">
+    <input type="search" name="q" value="{{ q }}" placeholder="Event, venue, city or promoter" aria-label="Search events">
+    <input type="hidden" name="cat" value="{{ cat }}">
+    <div class="chips chips-sm">
+      {% for key, label in fields %}
+        <label class="chip {% if field == key %}on{% endif %}"><input type="radio" name="field" value="{{ key }}" {% if field == key %}checked{% endif %} onchange="this.form.submit()">{{ label }}</label>
+      {% endfor %}
+    </div>
+  </form>
+  {% if searching %}<p class="small muted"><strong class="coral">{{ result_count }}</strong> {% if result_count == 1 %}event{% else %}events{% endif %} found · <a href="?cat={{ cat }}">Clear search</a></p>{% endif %}
+</section>
+
+<div class="chips scroll">
+  {% for ch in chips %}
+    <a class="chip {% if ch.on %}on{% endif %}" href="?cat={{ ch.key }}{% if q %}&q={{ q|urlencode }}&field={{ field }}{% endif %}">{{ ch.label }}{% if ch.key != 'all' and ch.count %} <span class="count">{{ ch.count }}</span>{% endif %}</a>
+  {% endfor %}
+</div>
+
+{% if hot %}
+<h2 class="section-title">Hot right now 🔥</h2>
+<div class="carousel">
+  {% for c in hot %}
+  <a class="hot-card" href="{% url 'event_detail' c.e.id %}" {% if c.image %}style="background-image:linear-gradient(transparent 35%,#000e),url('{{ c.image }}')"{% endif %}>
+    <div class="datechip"><span>{{ c.date|date:"M" }}</span><strong>{{ c.date|date:"j" }}</strong></div>
+    <span class="tag tag-price">{{ c.e.price_label }}</span>
+    <div class="hot-body"><h3>{{ c.e.title }}</h3><p>{{ c.e.venue_line }}</p></div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% for label, cards in groups.items %}
+  <h2 class="section-title">{{ label }} <span class="count-pill">{{ cards|length }}</span></h2>
+  <div class="grid">{% for c in cards %}{% include "biyet/_card.html" %}{% endfor %}</div>
+{% empty %}
+  <section class="empty">
+    {% if searching %}
+      <h2>No events found</h2><p class="muted">Nothing matches “{{ q }}”. Check the spelling or switch the filter to All.</p>
+      <a class="btn" href="?">Clear search</a>
+    {% elif no_events %}
+      <h2>No events near you yet</h2><p class="muted">New events show up here as soon as promoters publish them.</p>
+    {% else %}
+      <h2>Nothing in this category right now</h2><p class="muted">Check the other categories to see what else is on.</p>
+      <a class="btn" href="?">Show all events</a>
+    {% endif %}
+  </section>
+{% endfor %}
+{% endblock %}

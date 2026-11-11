@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}List a ticket{% endblock %}
+{% block content %}
+<section class="form-page">
+  <h1>List a ticket</h1>
+  <p class="muted">Pass on a ticket you can't use.</p>
+  {% if not tickets %}
+    <section class="empty"><p class="muted">You have no valid tickets for upcoming events that aren't listed already.</p><a class="btn" href="{% url 'events' %}">Find events</a></section>
+  {% else %}
+  <form method="post" class="stack">
+    {% csrf_token %}
+    {% if error %}<div class="msg msg-error">{{ error }}</div>{% endif %}
+    <div class="field"><label>Ticket</label>
+      {% for t in tickets %}
+      <label class="tier"><input type="radio" name="ticket" value="{{ t.id }}" {% if form.ticket == t.id %}checked{% endif %}>
+        <span class="tier-main"><strong>{{ t.d.title }}</strong><span class="small muted">{{ t.date|date:"D, M j · g:i A" }} · {{ t.t.quantity|default:1 }} admit{{ t.t.quantity|default:1|pluralize }}</span></span>
+        <span class="tier-side"><span class="small muted">Paid</span><strong>{% if t.price %}${{ t.price|floatformat:2 }}{% else %}Free{% endif %}</strong></span></label>
+      {% endfor %}
+    </div>
+    <div class="field"><label>How?</label>
+      <div class="segmented" data-swap-type>
+        <label class="{% if form.type == 'free' %}on{% endif %}"><input type="radio" name="type" value="free" {% if form.type == 'free' %}checked{% endif %}>Free</label>
+        <label class="{% if form.type == 'sell' %}on{% endif %}"><input type="radio" name="type" value="sell" {% if form.type == 'sell' %}checked{% endif %}>Sell</label>
+        <label class="{% if form.type == 'exchange' %}on{% endif %}"><input type="radio" name="type" value="exchange" {% if form.type == 'exchange' %}checked{% endif %}>Trade</label>
+      </div>
+    </div>
+    <div class="field" data-show="sell"><label>Asking price ($)</label><input name="price" inputmode="decimal" value="{{ form.price }}" placeholder="0.00"><small class="muted">You can't ask more than you paid.</small></div>
+    <div class="field" data-show="exchange"><label>What do you want in exchange?</label><input name="exchange" value="{{ form.exchange }}" maxlength="80"></div>
+    <div class="field"><label>Note (optional)</label><textarea name="note" rows="2" maxlength="200">{{ form.note }}</textarea></div>
+    <button class="btn btn-block">List it</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}
+{% block scripts %}<script>
+(function(){const seg=document.querySelector('[data-swap-type]');if(!seg)return;
+function sync(){const v=(seg.querySelector('input:checked')||{}).value;seg.querySelectorAll('label').forEach(l=>l.classList.toggle('on',l.querySelector('input').checked));
+document.querySelectorAll('[data-show]').forEach(el=>el.hidden=el.dataset.show!==v);}seg.addEventListener('change',sync);sync();})();
+</script>{% endblock %}
