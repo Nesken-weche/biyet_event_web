@@ -51,7 +51,11 @@ def verify_id_token(id_token):
 
     app = get_app()
     try:
-        return auth.verify_id_token(id_token, app=app, check_revoked=True)
+        # Allow up to 10s of clock difference between this machine and Google's
+        # servers (otherwise a PC clock a second or two behind rejects every login
+        # with "Token used too early").
+        return auth.verify_id_token(
+            id_token, app=app, check_revoked=True, clock_skew_seconds=10)
     except Exception as exc:  # firebase_admin raises several distinct error types
         logger.info("Rejected Firebase ID token: %s", exc)
         return None
