@@ -1,10 +1,12 @@
 from django.urls import path
 
-from . import views, views_account as acct
+from . import seo, views, views_account as acct
 
 urlpatterns = [
-    # Dashboard tabs
-    path("", views.events_tab, name="events"),
+    # Dashboard tabs ("" = public home for visitors, Events tab when signed in)
+    path("", views.home, name="events"),
+    path("robots.txt", seo.robots_txt, name="robots_txt"),
+    path("sitemap.xml", seo.sitemap_xml, name="sitemap_xml"),
     path("discover/", views.discover_tab, name="discover"),
     path("history/", views.history_tab, name="history"),
     path("swap/", acct.swap_tab, name="swap"),

@@ -29,6 +29,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "events.seo.CanonicalHostMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -138,6 +139,15 @@ STRIPE_PAYMENT_INTENT_URL = os.environ.get(
     "https://us-central1-kobey-e0eca.cloudfunctions.net/GicheStripePaymentIntent",
 )
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+
+# --- SEO -------------------------------------------------------------------
+# The one public address of the site: canonical links, sitemap, share links.
+# The *.herokuapp.com address redirects here.
+SITE_URL = os.environ.get("SITE_URL", "https://www.biyetevent.com")
+BRAND_LOGO_URL = os.environ.get(
+    "BRAND_LOGO_URL",
+    "https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png",
+)
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"

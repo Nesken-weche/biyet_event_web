@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}{% if mode == 'signup' %}Create account{% else %}Sign in{% endif %}{% endblock %}
+{% block meta_description %}{% if mode == 'signup' %}Create your free Biyet Event account to get tickets for parties, concerts and festivals, earn points and swap seats.{% else %}Sign in to Biyet Event to get tickets, see your QR codes and swap seats.{% endif %}{% endblock %}
 {% block content %}
 <section class="auth-card">
   <img src="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/5cf3d339-3fb1-4162-8fe4-43a98826b177.png"

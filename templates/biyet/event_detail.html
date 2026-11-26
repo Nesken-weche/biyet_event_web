@@ -1,5 +1,38 @@
 {% extends "base.html" %}
-{% block title %}{{ e.title }}{% endblock %}
+{% block title %}{{ og_title }}{% endblock %}
+{% block meta_description %}{{ og_description }}{% endblock %}
+{% block share_meta %}
+  {# WhatsApp / Facebook / iMessage preview: title at venue, address, first image #}
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ og_url }}">
+  <meta property="og:title" content="{{ og_title }}">
+  <meta property="og:description" content="{{ og_description }}">
+  {% if og_image %}
+  <meta property="og:image" content="{{ og_image }}">
+  <meta property="og:image:alt" content="{{ og_title }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="{{ og_image }}">
+  {% else %}
+  <meta property="og:image" content="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png">
+  <meta name="twitter:card" content="summary">
+  {% endif %}
+  <meta name="twitter:title" content="{{ og_title }}">
+  <meta name="twitter:description" content="{{ og_description }}">
+  <link rel="canonical" href="{{ og_url }}">
+{% endblock %}
+{% block head %}
+<script type="application/ld+json">{{ event_jsonld|safe }}</script>
+<style>
+  /* Show each photo whole and centered (no cropping); tall flyers fit the screen. */
+  .detail .gallery { background: #000; }
+  .detail .gallery-track { align-items: center; }
+  .detail .gallery-track > img,
+  .detail .gallery-track > video {
+    flex: 0 0 100%; width: 100%; height: auto; max-height: 80vh;
+    aspect-ratio: auto; object-fit: contain; object-position: center; display: block; margin: 0 auto;
+  }
+</style>
+{% endblock %}
 {% block content %}
 <article class="detail">
   {% if e.media %}
@@ -36,7 +69,13 @@
 
   {% if e.content %}<h2 class="section-title">About this event</h2><div class="prose">{{ e.content|linebreaks }}</div>{% endif %}
 
-  {% if e.can_get_tix and not card.disabled %}
+  {% if public %}
+  <div class="cta">
+    <div><div class="price big">{{ e.price_label }}</div>{% if card.note %}<div class="small warn">{{ card.note }}</div>{% endif %}</div>
+    {% if card.disabled %}<button class="btn" disabled>{{ card.cta }}</button>
+    {% else %}<a class="btn" href="{% url 'login' %}?next={{ request.path|urlencode }}">Sign in to get tickets</a>{% endif %}
+  </div>
+  {% elif e.can_get_tix and not card.disabled %}
   <form method="post" action="{% url 'add_to_cart' e.id %}" class="tiers">
     {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
     <h2 class="section-title">Tickets</h2>
@@ -56,6 +95,7 @@
   <div class="cta"><div class="price big">{{ e.price_label }}</div><button class="btn" disabled>{{ card.cta }}</button></div>
   {% endif %}
 
+  {% if not public %}
   <details class="report">
     <summary>⚑ Report this event</summary>
     <form method="post" action="{% url 'report_event' e.id %}" class="stack">
@@ -65,5 +105,6 @@
       <button class="btn btn-ghost">Send report</button>
     </form>
   </details>
+  {% endif %}
 </article>
 {% endblock %}

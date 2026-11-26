@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block title %}Kote plezi a ye{% endblock %} · Biyet Event</title>
-  <meta name="description" content="Biyet Event — kote plezi a ye. Find events, grab tickets, swap seats.">
+  <meta name="description" content="{% block meta_description %}Biyet Event — kote plezi a ye. Find events, grab tickets, swap seats.{% endblock %}">
+  <meta name="robots" content="{% block robots %}{% if user.is_authenticated and tab and tab != 'events' %}noindex, nofollow{% else %}index, follow, max-image-preview:large{% endif %}{% endblock %}">
   <meta name="theme-color" content="#0f0d1a">
   <link rel="manifest" href="{% url 'manifest' %}">
   <!-- Biyet Event icon: browser tab, bookmarks, iPhone home screen -->
@@ -13,12 +14,16 @@
   <link rel="apple-touch-icon" href="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png">
   <!-- Preview when a Biyet link is shared (WhatsApp, Facebook, iMessage, X...) -->
   <meta property="og:site_name" content="Biyet Event">
-  <meta property="og:title" content="{% block og_title %}Biyet Event — Kote plezi a ye{% endblock %}">
+  {% block share_meta %}
+  <link rel="canonical" href="{{ canonical_url }}">
+  <meta property="og:url" content="{{ canonical_url }}">
+  <meta property="og:title" content="Biyet Event — Kote plezi a ye">
   <meta property="og:description" content="Find events, grab tickets, swap seats.">
   <meta property="og:image" content="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:image" content="https://localplugz.s3.us-east-2.amazonaws.com/featured_images/cf79b589-40d0-4cb3-8662-275abb9a4feb.png">
+  {% endblock %}
   <meta name="application-name" content="Biyet Event">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

@@ -117,6 +117,15 @@ def card_ctx(e: KEvent, items):
 # --------------------------------------------------------------------------- #
 
 
+def home(request):
+    """biyetevent.com: public events page for visitors and Google, the Events
+    tab for signed-in customers."""
+    if request.user.is_authenticated:
+        return events_tab(request)
+    from .seo import public_home
+    return public_home(request)
+
+
 @customer_required
 def events_tab(request):
     c = customer(request)
@@ -250,8 +259,40 @@ def discover_tab(request):
 # --------------------------------------------------------------------------- #
 
 
-@customer_required
+def share_meta(request, e: KEvent):
+    """Link preview (WhatsApp, Facebook, iMessage...):
+    title = "<event title> at <venue>", description = the address,
+    image = the first eMedia item when it is an image."""
+    title = f"{e.title} at {e.biz_name}" if e.biz_name else e.title
+    address = ", ".join(x for x in (e.biz_add, e.biz_city, e.biz_state) if x.strip())
+    first = e.media[0] if e.media else None
+    image = first["url"] if first and not first["is_video"] else ""
+    from .seo import absolute, event_jsonld
+    return {"og_title": title, "og_description": address or e.biz_name or "Biyet Event",
+            "og_image": image, "og_url": absolute(f"/events/{e.id}/"), "event_jsonld": event_jsonld(e)}
+
+
 def event_detail(request, event_id):
+    """Signed-in customers get the full page. Everyone else (including the
+    WhatsApp / Facebook link-preview bots) gets a read-only page with the
+    preview tags, plus a button to sign in for tickets."""
+    if request.user.is_authenticated:
+        return _event_detail_customer(request, event_id)
+    e = data.get_event(event_id)
+    if e is None or not e.is_visible:
+        raise Http404
+    from .domain import REPORT_REASONS
+    return render(request, "biyet/event_detail.html", {
+        "public": True, "card": card_ctx(e, []), "e": e, "date": local(e.event_date),
+        "tiers": [{"t": t, "price": e.tier_price(t), "left": e.tier_left(t), "sold_out": e.tier_sold_out(t)}
+                  for t in e.tiers],
+        "place": ", ".join(x for x in (e.biz_city, e.biz_state) if x), "reasons": REPORT_REASONS,
+        **share_meta(request, e),
+    })
+
+
+@customer_required
+def _event_detail_customer(request, event_id):
     c = customer(request)
     e = data.get_event(event_id)
     if e is None or not e.is_visible or (e.country and e.country != c.country):
@@ -264,6 +305,7 @@ def event_detail(request, event_id):
     return render(request, "biyet/event_detail.html", {
         "tab": "events", "card": card_ctx(e, items), "e": e, "tiers": tiers, "date": local(e.event_date),
         "place": ", ".join(x for x in (e.biz_city, e.biz_state) if x), "reasons": REPORT_REASONS,
+        **share_meta(request, e),
         "approx_price": None if rates.event_currency(e) == (rates.currency_of_country(c.country) or "USD")
         else rates.convert(e.lowest_price, e.currency, rates.currency_of_country(c.country) or "USD", e.country),
     })

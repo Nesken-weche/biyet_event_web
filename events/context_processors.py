@@ -12,6 +12,8 @@ def firebase_config(request):
         "cart_count": 0,
         "initials": "",
         "notif_dot": False,
+        # One address for search engines, whatever host the visitor used.
+        "canonical_url": settings.SITE_URL.rstrip("/") + request.path,
     }
     if getattr(request, "user", None) is None or not request.user.is_authenticated:
         return out

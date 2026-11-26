@@ -21,6 +21,8 @@
     </div>
     {% if c.disabled %}
       <button class="btn btn-sm" disabled>{{ c.cta }}</button>
+    {% elif public %}
+      <a class="btn btn-sm" href="{% url 'event_detail' c.e.id %}">{% if c.e.can_get_tix %}Get tickets{% else %}See event{% endif %}</a>
     {% elif c.e.can_get_tix %}
       <form method="post" action="{% url 'add_to_cart' c.e.id %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
         <button class="btn btn-sm {% if c.in_cart %}btn-ghost-coral{% endif %}">{% if c.in_cart %}✓ {% endif %}{{ c.cta }}</button>

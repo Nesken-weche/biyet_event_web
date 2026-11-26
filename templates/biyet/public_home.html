@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Events, parties &amp; tickets — Kote plezi a ye{% endblock %}
+{% block meta_description %}Biyet Event: find parties, concerts, festivals and club nights near you. Get your tickets in seconds, show your QR code at the door, and swap seats you can't use.{% endblock %}
+{% block head %}<script type="application/ld+json">{{ jsonld|safe }}</script>{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="tagline-eyebrow">Biyet Event</p>
+  <h1 class="tagline">Kote plezi<br>a ye<span class="spark">✦</span></h1>
+  <p class="muted hero-sub">Find parties, concerts, festivals and club nights. Get your tickets in seconds, show your QR code at the door, and swap seats you can't use.</p>
+  <div class="row">
+    <a class="btn" href="{% url 'signup' %}">Create a free account</a>
+    <a class="btn btn-ghost" href="{% url 'login' %}">Sign in</a>
+  </div>
+</section>
+
+{% if countries|length > 1 %}
+<nav class="chips scroll" aria-label="Country">
+  <a class="chip {% if not pick %}on{% endif %}" href="{% url 'events' %}">All</a>
+  {% for code, name in countries %}<a class="chip {% if pick == code %}on{% endif %}" href="?country={{ code }}">{{ name }}</a>{% endfor %}
+</nav>
+{% endif %}
+
+<h2 class="section-title">Upcoming events</h2>
+{% if cards %}
+  <div class="grid">{% for c in cards %}{% include "biyet/_card.html" %}{% endfor %}</div>
+{% else %}
+  <section class="empty"><p class="muted">New events show up here as soon as promoters publish them.</p></section>
+{% endif %}
+
+<section class="panel center stack" style="margin-top:2rem">
+  <h2>Get the Biyet Event app</h2>
+  <p class="muted">Tickets, Swap, rewards and notifications on your phone.</p>
+  <p><a class="btn" href="https://play.google.com/store/apps/details?id=com.kenutek.giche" rel="noopener">Get it on Google Play</a></p>
+</section>
+{% endblock %}
